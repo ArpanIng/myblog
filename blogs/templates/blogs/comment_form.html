@@ -1,0 +1,10 @@
+{% load crispy_forms_tags %}
+
+<div class="pb-5">
+  <h2>Add a comment</h2>
+  <form action="" method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button class="btn btn-success ml-2" type="submit">Comment</button>
+  </form>
+</div>

@@ -1,4 +1,4 @@
-{% extends 'test_base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}My Blog{% endblock title %}
 
@@ -16,9 +16,7 @@
           {{ post.title }}</a
         >
       </h2>
-      {% if tag %}
-      <p>Posts {{ tag.name }}</p>
-      {% endif %}
+      
       <p class="blog-post-meta">
         {{ post.publish|date:'M j, o' }} by
         <a class="text-decoration-none text-secondary" href="#">{{ post.author }}</a>

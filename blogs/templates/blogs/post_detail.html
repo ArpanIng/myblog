@@ -1,4 +1,4 @@
-{% extends 'test_base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}{{ post.title }}{% endblock title %}
 
@@ -12,17 +12,25 @@
       <a class="text-decoration-none text-secondary" href="#">{{ post.author }}</a>
     </p>
     <p>{{ post.body|linebreaks }}</p>
-    <p>
-      <a class="text-secondary" href="{% url 'blogs:post_share' post.id %}">Share this post</a>
-    </p>
+    {% if request.user == post.author %}
+      <a class="btn btn-success" href="{% url 'blogs:post_update' post.publish.year post.publish.month post.publish.day post.slug %}">
+        Update
+      </a>
+      <a class="btn btn-danger" href="{% url 'blogs:post_delete' post.publish.year post.publish.month post.publish.day post.slug %}">
+        Delete
+      </a>
+    {% endif %}
     <hr>
     {% with comments.count as total_comments %}
-    <h4>{{ total_comments }} comment{{ total_comments|pluralize }}</h4>
+    <h4>{{ total_comments }} Comment{{ total_comments|pluralize }}</h4>
     {% endwith %}
     {% for comment in comments %}
-    <p>Comment {{ forloop.counter }} by {{ comment.name }} {{ comment.created }}</p>
-    {{ comment.body|linebreaks  }}
+    <p><b>{{ comment.author.username }}</b> - {{ comment.created|timesince }} ago</p>
+    {{ comment.comment|linebreaks  }}
+    {% empty %}
+    <p>There are no comments.</p>
     {% endfor %}
+    <hr>
   </div>
   
   <div class="col-md-4">
@@ -39,6 +47,10 @@
       </div>
     </div>
   </div>
+  
+  {% if request.user.is_authenticated %}
+    {% include 'blogs/comment_form.html' %}
+  {% endif %}
   
 </div>
 {% endblock content %}
