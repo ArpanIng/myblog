@@ -1,6 +1,6 @@
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.db import models
-from django.db.models.query import QuerySet
+from django.template.defaultfilters import slugify
 from django.urls import reverse
 from django.utils import timezone
 from taggit.managers import TaggableManager
@@ -12,7 +12,7 @@ class PublishedManager(models.Manager):
     Returns: Post with 'PUBLISHED' status
     """
 
-    def get_queryset(self) -> QuerySet:
+    def get_queryset(self):
         return super().get_queryset().filter(status=Post.Status.PUBLISHED)
 
 
@@ -31,7 +31,7 @@ class Post(models.Model):
         default=Status.DRAFT,
     )
     author = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="blog_posts",
     )
@@ -47,6 +47,11 @@ class Post(models.Model):
             models.Index(fields=["-publish"]),
         ]
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        return super().save(*args, **kwargs)
+
     def get_absolute_url(self):
         return reverse(
             "blogs:post_detail",
@@ -58,24 +63,34 @@ class Post(models.Model):
             ],
         )
 
+    # def get_absolute_url(self):
+    #     return reverse(
+    #         "blogs:post_detail",
+    #         kwargs={
+    #             "publish_year": self.publish.year,
+    #             "publish_month": self.publish.month,
+    #             "publish_day": self.publish.day,
+    #             "slug": self.slug,
+    #         },
+    #     )
+
     def __str__(self):
         return self.title
 
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
-    name = models.CharField(max_length=80)
-    email = models.EmailField()
-    body = models.TextField()
+    comment = models.TextField()
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     active = models.BooleanField(default=True)
 
     class Meta:
-        ordering = ["created"]
+        ordering = ["-created"]
         indexes = [
             models.Index(fields=["created"]),
         ]
 
     def __str__(self) -> str:
-        return f"Comment by {self.name} on {self.post}"
+        return f"Comment on '{self.post.title}' by {self.author.username}"
