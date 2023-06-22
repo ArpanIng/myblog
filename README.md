@@ -1,5 +1,7 @@
 # MyBlog
 
+![MyBlog](src/MyBlog.png)
+
 - The application allows users to register, log in, and manage their accounts. Users can change, and reset their password.
 - Users can create new blog posts by providing a title, content, and status after logging in. They can also edit or delete their existing blog posts.
 - SEO friendly cannonical url.
