@@ -1,7 +1,8 @@
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Count
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import generic
@@ -10,6 +11,8 @@ from taggit.models import Tag
 
 from .forms import PostModelForm, CommentModelForm
 from .models import Post, Comment
+
+User = get_user_model()
 
 
 def post_list_view(request, tag_slug=None):
@@ -32,6 +35,25 @@ def post_list_view(request, tag_slug=None):
         "tag": tag,
     }
     return render(request, "blogs/post_list.html", context)
+
+
+@login_required
+def user_post_list_view(request, username):
+    user = get_object_or_404(User, username=username)
+    post_list = Post.published.filter(author=user).order_by("-updated")
+    paginator = Paginator(post_list, 5)
+    page_number = request.GET.get("page")
+    try:
+        posts = paginator.page(page_number)
+    except EmptyPage:
+        posts = paginator.page(paginator.num_pages)
+    except PageNotAnInteger:
+        posts = paginator.page(number=1)
+    context = {
+        "user": user,
+        "posts": posts,
+    }
+    return render(request, "blogs/user_posts.html", context)
 
 
 class PostCreateView(LoginRequiredMixin, generic.CreateView):

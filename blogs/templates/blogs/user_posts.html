@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 
-{% block title %}My Blog{% endblock title %}
+{% block title %}{{ user.username }}'s' Blogs{% endblock title %}
 
 {% block content %}
+<h1 class="mb-3">Posts by '{{ user.username }}'</h1>
 <div class="row g-5">
   <div class="col-md-8">
     
@@ -13,18 +14,13 @@
           class="text-decoration-none text-dark"
           href="{{ post.get_absolute_url }}"
         >
-          {{ post.title }}
-        </a>
+          {{ post.title }}</a
+        >
       </h2>
       
       <p class="blog-post-meta">
         {{ post.publish|date:'M j, o' }} by
-        <a
-          class="text-decoration-none text-secondary"
-          href="{% url 'blogs:user_posts' post.author.username %}"
-        >
-          {{ post.author }}
-        </a>
+        <a class="text-decoration-none text-secondary" href="#">{{ post.author }}</a>
       </p>
       <p>{{ post.body|truncatewords:30|linebreaks }}</p>
       <hr />
