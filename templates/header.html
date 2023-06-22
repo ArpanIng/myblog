@@ -1,15 +1,12 @@
 <div class="container pb-3">
   <header class="blog-header lh-1 py-3">
     <div class="row flex-nowrap justify-content-between align-items-center">
-      <div class="col-4 pt-1">
-        <a class="link-secondary" href="#">Subscribe</a>
-      </div>
       <div class="col-4 text-center">
         <a
           class="blog-header-logo text-body-emphasis"
           href="{% url 'blogs:post_list' %}"
-          >Large</a
-        >
+          >MyBlog
+        </a>
       </div>
       <div class="col-4 d-flex justify-content-end align-items-center">
         <a class="link-secondary" href="#" aria-label="Search">
@@ -33,9 +30,13 @@
         </a>
         {% if request.user.is_authenticated %}
         <div class="col-3 pt-1">
-          <a class="link-secondary text-decoration-none hover:text-primary" href="{% url 'blogs:post_create' %}">New Post</a>
+          <a class="link-secondary text-decoration-none hover:text-primary" href="{% url 'blogs:post_create' %}">
+            New Post
+          </a>
         </div>
-        <a class="btn btn-sm btn-outline-secondary" href="{% url 'accounts:logout' %}">Logout</a>
+        <a class="ms-3 btn btn-sm btn-outline-secondary" href="{% url 'accounts:profile' %}">Profile</a>
+        <a class="ms-3 btn btn-sm btn-outline-secondary" href="{% url 'accounts:password_change' %}">Change Password</a>
+        <a class="ms-3 btn btn-sm btn-outline-secondary" href="{% url 'accounts:logout' %}">Logout</a>
         {% else %}
         <a class="btn btn-sm btn-outline-secondary" href="{% url 'accounts:login' %}">Log in</a>
         <a class="ms-3 btn btn-sm btn-outline-secondary" href="{% url 'accounts:signup' %}">Sign up</a>
