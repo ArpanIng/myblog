@@ -3,7 +3,6 @@ from django.db import models
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 from django.utils import timezone
-from taggit.managers import TaggableManager
 
 
 class PublishedManager(models.Manager):
@@ -39,7 +38,6 @@ class Post(models.Model):
     updated = models.DateTimeField(auto_now=True)
     objects = models.Manager()  # default Manager
     published = PublishedManager()  # custom Manager
-    tags = TaggableManager()
 
     class Meta:
         ordering = ["-publish"]
@@ -82,4 +80,4 @@ class Comment(models.Model):
         ]
 
     def __str__(self) -> str:
-        return f"Comment on '{self.post.title}' by {self.author.username}"
+        return f"Comment '{self.comment}' by {self.author.username}"

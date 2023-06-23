@@ -35,7 +35,6 @@ INSTALLED_APPS = [
     "accounts.apps.AccountsConfig",
     "blogs.apps.BlogsConfig",
     # third-party package
-    "taggit",
     "crispy_forms",
     "crispy_bootstrap5",
 ]

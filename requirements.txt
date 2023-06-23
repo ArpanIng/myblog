@@ -5,7 +5,6 @@ crispy-bootstrap5==0.7
 Django==4.2.1
 django-crispy-forms==2.0
 django-environ==0.10.0
-django-taggit==4.0.0
 mypy-extensions==1.0.0
 packaging==23.1
 pathspec==0.11.1

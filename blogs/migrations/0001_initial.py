@@ -4,14 +4,12 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 import django.utils.timezone
-import taggit.managers
 
 
 class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("taggit", "0005_auto_20220424_2025"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
@@ -48,15 +46,6 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="blog_posts",
                         to=settings.AUTH_USER_MODEL,
-                    ),
-                ),
-                (
-                    "tags",
-                    taggit.managers.TaggableManager(
-                        help_text="A comma-separated list of tags.",
-                        through="taggit.TaggedItem",
-                        to="taggit.Tag",
-                        verbose_name="Tags",
                     ),
                 ),
             ],
