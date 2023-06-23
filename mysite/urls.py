@@ -5,6 +5,7 @@ from django.contrib.sitemaps.views import sitemap
 from django.urls import path, include
 
 from blogs.views import post_list_view
+from blogs.feeds import PostsFeeds, AtomSiteNewsFeed
 from blogs.sitemaps import PostSitemap
 
 sitemaps = {
@@ -20,6 +21,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("account/", include("accounts.urls", namespace="accounts")),
     path("blog/", include("blogs.urls")),
+    path("feed/rss", PostsFeeds(), name="post_feed"),
+    path("feed/atom", AtomSiteNewsFeed()),
     path("sitemap.xml", sitemap, context, name="django.contrib.sitemaps.views.sitemap"),
 ]
 
