@@ -3,9 +3,9 @@
 {% block title %}{{ post.title }}{% endblock title %}
 
 {% block content %}
-<div class="row g-5 pt-2">
+<div class="g-5 pt-4">
   
-  <div class="col-md-8">
+  <div class="container col-md-8">
     <h1 class="blog-post-title">{{ post.title }}</h1>
     <p class="blog-post-meta">
       {{ post.publish|date:'M j, o' }} by
@@ -32,8 +32,6 @@
     {% endfor %}
     <hr>
   </div>
-  
-  {% include 'sidebar.html' %}
   
   {% if request.user.is_authenticated %}
     {% include 'blogs/comment_form.html' %}

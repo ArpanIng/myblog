@@ -1,10 +1,8 @@
 {% extends 'base.html' %}
 
-{% block title %}My Blog{% endblock title %}
-
 {% block content %}
-<div class="row g-5 pt-2">
-  <div class="col-md-8">
+<div class="g-5 pt-4">
+  <div class="container col-md-8">
     
     {% for post in posts %}
     <article class="blog-post">
@@ -26,13 +24,12 @@
           {{ post.author }}
         </a>
       </p>
-      <p>{{ post.body|truncatewords:30|linebreaks }}</p>
+      <p>{{ post.body|truncatewords:30 }}</p>
       <hr />
     </article>
     {% endfor %}
 
   </div>
-  {% include 'sidebar.html' %}
   {% include 'pagination.html' with page=posts %}
 </div>
 {% endblock content %}

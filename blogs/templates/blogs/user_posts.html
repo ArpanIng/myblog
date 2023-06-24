@@ -3,9 +3,9 @@
 {% block title %}{{ user.username }}'s' Blogs{% endblock title %}
 
 {% block content %}
-<h1 class="mb-3">Posts by '{{ user.username }}'</h1>
-<div class="row g-5 pt-2">
-  <div class="col-md-8">
+<h1 class="mb-3 text-center">Posts by '{{ user.username }}'</h1>
+<div class="g-5 pt-4">
+  <div class="container col-md-8">
     
     {% for post in posts %}
     <article class="blog-post">
@@ -28,7 +28,6 @@
     {% endfor %}
 
   </div>
-  {% include 'sidebar.html' %}
   {% include 'pagination.html' with page=posts %}
 </div>
 {% endblock content %}
