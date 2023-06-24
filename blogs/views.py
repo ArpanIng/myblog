@@ -2,14 +2,12 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import Count
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import generic
 
-
 from .forms import PostModelForm, CommentModelForm
-from .models import Post, Comment
+from .models import Post
 
 User = get_user_model()
 
@@ -154,3 +152,7 @@ def post_delete_view(request, year, month, day, post):
         "post": post,
     }
     return render(request, "blogs/post_delete.html", context)
+
+
+def about_view(request):
+    return render(request, "about.html")
