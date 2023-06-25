@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load markdown_extras %}
 
 {% block title %}{{ post.title }}{% endblock title %}
 
@@ -11,7 +12,7 @@
       {{ post.publish|date:'M j, o' }} by
       <a class="text-decoration-none text-secondary" href="#">{{ post.author }}</a>
     </p>
-    <p>{{ post.body|linebreaks }}</p>
+    {{ post.body|markdown|safe }}
     {% if request.user == post.author %}
       <a class="btn btn-success" href="{% url 'blogs:post_update' post.publish.year post.publish.month post.publish.day post.slug %}">
         Update
@@ -21,15 +22,17 @@
       </a>
     {% endif %}
     <hr>
-    {% with comments.count as total_comments %}
-    <h4>{{ total_comments }} Comment{{ total_comments|pluralize }}</h4>
-    {% endwith %}
-    {% for comment in comments %}
-    <p><b>{{ comment.author.username }}</b> - {{ comment.created|timesince }} ago</p>
-    {{ comment.comment|linebreaks  }}
-    {% empty %}
-    <p>There are no comments.</p>
-    {% endfor %}
+    <div class="my-4">
+      {% with comments.count as total_comments %}
+      <h4>{{ total_comments }} Comment{{ total_comments|pluralize }}</h4>
+      {% endwith %}
+      {% for comment in comments %}
+      <p><b>{{ comment.author.username }}</b> - {{ comment.created|timesince }} ago</p>
+      {{ comment.comment|linebreaks  }}
+      {% empty %}
+      <p>There are no comments.</p>
+      {% endfor %}
+    </div>
     <hr>
   </div>
   
