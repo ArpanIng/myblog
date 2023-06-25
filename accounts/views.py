@@ -1,5 +1,8 @@
+from typing import Any
 from django.contrib.auth import views
 from django.contrib.auth.decorators import login_required
+from django.http.request import HttpRequest
+from django.http.response import HttpResponseBase
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import generic
@@ -10,6 +13,11 @@ from .forms import CustomUserCreationForm, UserUpdateForm, ProfileUpdateForm
 class CustomLoginView(views.LoginView):
     template_name = "accounts/login.html"
 
+    def dispatch(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect("blogs:post_list")
+        return super().dispatch(request, *args, **kwargs)
+
 
 class CustomLogoutView(views.LogoutView):
     pass
@@ -19,6 +27,11 @@ class CustomSignupView(generic.CreateView):
     form_class = CustomUserCreationForm
     success_url = reverse_lazy("accounts:login")
     template_name = "accounts/signup.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect("blogs:post_list")
+        return super().dispatch(request, *args, **kwargs)
 
 
 @login_required
