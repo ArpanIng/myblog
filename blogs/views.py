@@ -12,16 +12,21 @@ from .models import Post
 User = get_user_model()
 
 
+def search_form(request):
+    if request.GET.get("q") == None:
+        q = ""
+    else:
+        q = request.GET.get("q")
+    # user can search blog post by title
+    results = Post.objects.filter(title__icontains=q)
+    return render(request, "blogs/search.html", {"results": results})
+
+
 def post_list_view(request):
     post_list = Post.published.all()
-    paginator = Paginator(post_list, 5)
+    paginator = Paginator(post_list, per_page=5)
     page_number = request.GET.get("page")
-    try:
-        posts = paginator.page(page_number)
-    except EmptyPage:
-        posts = paginator.page(paginator.num_pages)
-    except PageNotAnInteger:
-        posts = paginator.page(number=1)
+    posts = paginator.get_page(page_number)
 
     context = {
         "posts": posts,

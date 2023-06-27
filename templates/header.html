@@ -11,14 +11,11 @@
         </li>
       </ul>
 
-      <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
-        <input type="search" class="form-control" placeholder="Search..." aria-label="Search"/>
+      <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" action="{% url 'blogs:search' %}" method="get">
+        <input name="q" class="form-control" placeholder="Search..." aria-label="Search"/>
       </form>
 
       {% if request.user.is_authenticated %}
-      <a class="mx-4 link-secondary text-decoration-none hover:text-primary" href="{% url 'about' %}">
-        About
-      </a>
       <div class="dropdown text-end">
         <a
           href="#"
