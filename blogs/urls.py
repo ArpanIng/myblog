@@ -7,20 +7,20 @@ urlpatterns = [
     path("", views.post_list_view, name="post_list"),
     path("<str:username>/posts/", views.user_post_list_view, name="user_posts"),
     path("new/", views.PostCreateView.as_view(), name="post_create"),
+    path("search/", views.search_form, name="search"),
     path(
-        "<int:year>/<int:month>/<int:day>/<slug:post>/",
-        views.post_detail_view,
+        "<slug:post_slug>/",
+        views.PostDetailView.as_view(),
         name="post_detail",
     ),
     path(
-        "<int:year>/<int:month>/<int:day>/<slug:post>/update/",
-        views.post_update_view,
+        "<slug:post_slug>/update/",
+        views.PostUpdateView.as_view(),
         name="post_update",
     ),
     path(
-        "<int:year>/<int:month>/<int:day>/<slug:post>/delete/",
-        views.post_delete_view,
+        "<slug:post_slug>/delete/",
+        views.PostDeleteView.as_view(),
         name="post_delete",
     ),
-    path("tag/<slug:tag_slug>/", views.post_list_view, name="post_list_by_tag"),
 ]

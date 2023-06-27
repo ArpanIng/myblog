@@ -1,8 +1,5 @@
-from typing import Any
 from django.contrib.auth import views
-from django.contrib.auth.decorators import login_required
-from django.http.request import HttpRequest
-from django.http.response import HttpResponseBase
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import generic
@@ -34,28 +31,34 @@ class CustomSignupView(generic.CreateView):
         return super().dispatch(request, *args, **kwargs)
 
 
-@login_required
-def profile(request):
-    if request.method == "POST":
-        u_form = UserUpdateForm(request.POST, instance=request.user)
+class ProfileView(LoginRequiredMixin, generic.View):
+    def get(self, request, *args, **kwargs):
+        u_form = UserUpdateForm(instance=self.request.user)
+        p_form = ProfileUpdateForm(instance=self.request.user.profile)
+
+        context = {
+            "u_form": u_form,
+            "p_form": p_form,
+        }
+        return render(request, "accounts/profile.html", context)
+
+    def post(self, request, *args, **kwargs):
+        u_form = UserUpdateForm(self.request.POST, instance=self.request.user)
         p_form = ProfileUpdateForm(
-            request.POST,
-            request.FILES,
-            instance=request.user.profile,
+            self.request.POST,
+            self.request.FILES,
+            instance=self.request.user.profile,
         )
         if u_form.is_valid() and p_form.is_valid():
             u_form.save()
             p_form.save()
             return redirect("accounts:profile")
-    else:
-        u_form = UserUpdateForm(instance=request.user)
-        p_form = ProfileUpdateForm(instance=request.user.profile)
 
-    context = {
-        "u_form": u_form,
-        "p_form": p_form,
-    }
-    return render(request, "accounts/profile.html", context)
+        context = {
+            "u_form": u_form,
+            "p_form": p_form,
+        }
+        return render(request, "accounts/profile.html", context)
 
 
 class CustomPasswordChangeView(views.PasswordChangeView):

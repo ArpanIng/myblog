@@ -14,10 +14,10 @@
     </p>
     {{ post.body|markdown|safe }}
     {% if request.user == post.author %}
-      <a class="btn btn-success" href="{% url 'blogs:post_update' post.publish.year post.publish.month post.publish.day post.slug %}">
+      <a class="btn btn-success" href="{% url 'blogs:post_update' post.slug %}">
         Update
       </a>
-      <a class="btn btn-danger" href="{% url 'blogs:post_delete' post.publish.year post.publish.month post.publish.day post.slug %}">
+      <a class="btn btn-danger" href="{% url 'blogs:post_delete' post.slug %}">
         Delete
       </a>
     {% endif %}

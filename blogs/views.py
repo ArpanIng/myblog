@@ -1,10 +1,10 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.http import HttpResponse
-from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.paginator import Paginator
+from django.shortcuts import render, get_object_or_404
+from django.urls import reverse, reverse_lazy
 from django.views import generic
+from django.views.generic.detail import SingleObjectMixin
 
 from .forms import PostModelForm, CommentModelForm
 from .models import Post
@@ -37,14 +37,9 @@ def post_list_view(request):
 def user_post_list_view(request, username):
     user = get_object_or_404(User, username=username)
     post_list = Post.published.filter(author=user).order_by("-updated")
-    paginator = Paginator(post_list, 5)
+    paginator = Paginator(post_list, per_page=5)
     page_number = request.GET.get("page")
-    try:
-        posts = paginator.page(page_number)
-    except EmptyPage:
-        posts = paginator.page(paginator.num_pages)
-    except PageNotAnInteger:
-        posts = paginator.page(number=1)
+    posts = paginator.get_page(page_number)
 
     context = {
         "user": user,
@@ -63,101 +58,93 @@ class PostCreateView(LoginRequiredMixin, generic.CreateView):
         return super().form_valid(form)
 
 
-def post_detail_view(request, year, month, day, post):
-    post = get_object_or_404(
-        Post,
-        status=Post.Status.PUBLISHED,
-        publish__year=year,
-        publish__month=month,
-        publish__day=day,
-        slug=post,
-    )
+class CommentGetView(generic.DetailView):
+    context_object_name = "post"
+    template_name = "blogs/post_detail.html"
 
-    # list of active comments for a post
-    comments = post.comments.filter(active=True)
+    def get_object(self):
+        return get_object_or_404(
+            Post,
+            status=Post.Status.PUBLISHED,
+            slug=self.kwargs["post_slug"],
+        )
 
-    if request.method == "POST":
-        form = CommentModelForm(data=request.POST)
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.post = post
-            comment.author = request.user
-            comment.save()
-            return redirect(
-                "blogs:post_detail",
-                post.publish.year,
-                post.publish.month,
-                post.publish.day,
-                post.slug,
-            )
-    else:
-        form = CommentModelForm()
-
-    context = {
-        "post": post,
-        "comments": comments,
-        "form": form,
-    }
-    return render(request, "blogs/post_detail.html", context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        post = self.get_object()
+        # list of active comments for a post
+        comments = post.comments.filter(active=True)
+        context["comments"] = comments
+        context["form"] = CommentModelForm()
+        return context
 
 
-@login_required
-def post_update_view(request, year, month, day, post):
-    post = get_object_or_404(
-        Post,
-        status=Post.Status.PUBLISHED,
-        publish__year=year,
-        publish__month=month,
-        publish__day=day,
-        slug=post,
-    )
+class CommentPostView(SingleObjectMixin, generic.FormView):
+    form_class = CommentModelForm
+    template_name = "blogs/post_detail.html"
 
-    if request.user != post.author:
-        return HttpResponse("Forbidden! Access not granted.")
+    def get_object(self):
+        return get_object_or_404(
+            Post,
+            status=Post.Status.PUBLISHED,
+            slug=self.kwargs["post_slug"],
+        )
 
-    if request.method == "POST":
-        form = PostModelForm(request.POST, instance=post)
-        if form.is_valid():
-            form.save()
-            return redirect(
-                "blogs:post_detail",
-                post.publish.year,
-                post.publish.month,
-                post.publish.day,
-                post.slug,
-            )
-    form = PostModelForm(instance=post)
+    def form_valid(self, form):
+        comment = form.save(commit=False)
+        comment.post = self.get_object()
+        comment.author = self.request.user
+        comment.save()
+        return super().form_valid(form)
 
-    context = {
-        "post": post,
-        "form": form,
-    }
-    return render(request, "blogs/post_update.html", context)
+    def get_success_url(self):
+        post = self.get_object()
+        return reverse("blogs:post_detail", kwargs={"post_slug": post.slug})
 
 
-@login_required
-def post_delete_view(request, year, month, day, post):
-    post = get_object_or_404(
-        Post,
-        status=Post.Status.PUBLISHED,
-        publish__year=year,
-        publish__month=month,
-        publish__day=day,
-        slug=post,
-    )
+class PostDetailView(generic.DetailView):
+    def get(self, request, *args, **kwargs):
+        view = CommentGetView.as_view()
+        return view(request, *args, **kwargs)
 
-    if request.user != post.author:
-        return HttpResponse("Forbidden! Access not granted.")
-
-    if request.method == "POST":
-        post.delete()
-        return redirect("blogs:post_list")
-
-    context = {
-        "post": post,
-    }
-    return render(request, "blogs/post_delete.html", context)
+    def post(self, request, *args, **kwargs):
+        view = CommentPostView.as_view()
+        return view(request, *args, **kwargs)
 
 
-def about_view(request):
-    return render(request, "about.html")
+class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
+    context_object_name = "post"
+    form_class = PostModelForm
+    template_name = "blogs/post_update.html"
+
+    def get_object(self):
+        return get_object_or_404(
+            Post,
+            status=Post.Status.PUBLISHED,
+            slug=self.kwargs["post_slug"],
+        )
+
+    def test_func(self):
+        post = self.get_object()
+        return post.author == self.request.user
+
+
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteView):
+    context_object_name = "post"
+    template_name = "blogs/post_delete.html"
+    success_url = reverse_lazy("blogs:post_list")
+
+    def get_object(self):
+        return get_object_or_404(
+            Post,
+            status=Post.Status.PUBLISHED,
+            slug=self.kwargs["post_slug"],
+        )
+
+    def test_func(self):
+        post = self.get_object()
+        return post.author == self.request.user
+
+
+class AboutView(generic.TemplateView):
+    template_name = "about.html"

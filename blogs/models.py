@@ -51,15 +51,7 @@ class Post(models.Model):
         return super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse(
-            "blogs:post_detail",
-            args=[
-                self.publish.year,
-                self.publish.month,
-                self.publish.day,
-                self.slug,
-            ],
-        )
+        return reverse("blogs:post_detail", kwargs={"post_slug": self.slug})
 
     def __str__(self):
         return self.title
