@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
 from django.urls import path, include
 
-from blogs.views import post_list_view, about_view
+from blogs.views import post_list_view, AboutView
 from blogs.feeds import PostsFeeds, AtomSiteNewsFeed
 from blogs.sitemaps import PostSitemap
 
@@ -18,7 +18,7 @@ context = {
 
 urlpatterns = [
     path("", post_list_view, name="post_list"),
-    path("about/", about_view, name="about"),
+    path("about/", AboutView.as_view(), name="about"),
     path("admin/", admin.site.urls),
     path("account/", include("accounts.urls", namespace="accounts")),
     path("blog/", include("blogs.urls")),
