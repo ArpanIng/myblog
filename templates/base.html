@@ -14,7 +14,7 @@
       integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ"
       crossorigin="anonymous"
     />
-    <link rel="stylesheet" href="{% static 'css/test_style.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
     <title>{% block title %}{% endblock title %}</title>
 
     <link
@@ -23,38 +23,20 @@
       integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ"
       crossorigin="anonymous"
     />
-
-    <!-- Favicons -->
-    <link
-      rel="apple-touch-icon"
-      href="/docs/5.3/assets/img/favicons/apple-touch-icon.png"
-      sizes="180x180"
-    />
-    <link
-      rel="icon"
-      href="/docs/5.3/assets/img/favicons/favicon-32x32.png"
-      sizes="32x32"
-      type="image/png"
-    />
-    <link
-      rel="icon"
-      href="/docs/5.3/assets/img/favicons/favicon-16x16.png"
-      sizes="16x16"
-      type="image/png"
-    />
-    <link rel="manifest" href="/docs/5.3/assets/img/favicons/manifest.json" />
-    <link
-      rel="mask-icon"
-      href="/docs/5.3/assets/img/favicons/safari-pinned-tab.svg"
-      color="#712cf9"
-    />
-    <link rel="icon" href="/docs/5.3/assets/img/favicons/favicon.ico" />
-    <meta name="theme-color" content="#712cf9" />
   </head>
   <body>
     {% include 'header.html' %}
 
     <main class="container col-lg-8 col-md-4">
+      {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}"{% endif %}>
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
       {% block content %}{% endblock content %}
     </main>
 

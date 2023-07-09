@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse, reverse_lazy
@@ -48,9 +49,10 @@ def user_post_list_view(request, username):
     return render(request, "blogs/user_posts.html", context)
 
 
-class PostCreateView(LoginRequiredMixin, generic.CreateView):
+class PostCreateView(LoginRequiredMixin, SuccessMessageMixin, generic.CreateView):
     model = Post
     form_class = PostModelForm
+    success_message = "The post has been created successfully."
     template_name = "blogs/post_create.html"
 
     def form_valid(self, form):
@@ -112,9 +114,12 @@ class PostDetailView(generic.DetailView):
         return view(request, *args, **kwargs)
 
 
-class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
+class PostUpdateView(
+    LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, generic.UpdateView
+):
     context_object_name = "post"
     form_class = PostModelForm
+    success_message = "The post has been updated successfully."
     template_name = "blogs/post_update.html"
 
     def get_object(self):
@@ -129,10 +134,13 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView
         return post.author == self.request.user
 
 
-class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteView):
+class PostDeleteView(
+    LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, generic.DeleteView
+):
     context_object_name = "post"
-    template_name = "blogs/post_delete.html"
+    success_message = "The post has been deleted successfully."
     success_url = reverse_lazy("blogs:post_list")
+    template_name = "blogs/post_delete.html"
 
     def get_object(self):
         return get_object_or_404(
