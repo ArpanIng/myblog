@@ -21,7 +21,7 @@ class Post(models.Model):
         PUBLISHED = "PB", "Published"
 
     title = models.CharField(max_length=250)
-    slug = models.SlugField(max_length=250, unique_for_date="publish")
+    slug = models.SlugField(max_length=250, unique=True)
     body = models.TextField()
     publish = models.DateTimeField(default=timezone.now)
     status = models.CharField(
@@ -45,16 +45,16 @@ class Post(models.Model):
             models.Index(fields=["-publish"]),
         ]
 
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title)
-        return super().save(*args, **kwargs)
+    def __str__(self):
+        return self.title
 
     def get_absolute_url(self):
         return reverse("blogs:post_detail", kwargs={"post_slug": self.slug})
 
-    def __str__(self):
-        return self.title
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        return super().save(*args, **kwargs)
 
 
 class Comment(models.Model):
@@ -72,4 +72,4 @@ class Comment(models.Model):
         ]
 
     def __str__(self) -> str:
-        return f"Comment '{self.comment}' by {self.author.username}"
+        return f"Commented by {self.author.username} on post {self.post}"

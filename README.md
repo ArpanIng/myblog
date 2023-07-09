@@ -1,6 +1,8 @@
 # MyBlog
 
-![MyBlog](src/MyBlog.png)
+![MyBlog](src/myBlog.png)
+
+## Features
 
 - The application allows users to register, log in, and manage their accounts. Users can change, and reset their password.
 - After logging in, users can create new blog posts by providing a title, content, and status. Markdown syntax can be used to customize the blog's content. They can also edit or delete their existing blog posts.

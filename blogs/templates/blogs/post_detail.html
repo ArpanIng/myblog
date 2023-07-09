@@ -8,10 +8,10 @@
   
   <div class="container col-md-8">
     <h1 class="blog-post-title">{{ post.title }}</h1>
-    <p class="blog-post-meta">
-      {{ post.publish|date:'M j, o' }} by
-      <a class="text-decoration-none text-secondary" href="#">{{ post.author }}</a>
-    </p>
+    {% if post.updated %}
+    <p class="blog-post-meta text-secondary">
+      Last Updated {{ post.updated|date:'M j, o' }}
+    {% endif %}
     {{ post.body|markdown|safe }}
     {% if request.user == post.author %}
       <a class="btn btn-success" href="{% url 'blogs:post_update' post.slug %}">
